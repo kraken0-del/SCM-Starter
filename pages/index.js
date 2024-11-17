@@ -1,5 +1,3 @@
-import {useState, useEffect} from "react";
-import {ethers} from "ethers";
 // Import necessary modules and libraries
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
@@ -20,7 +18,6 @@ export default function HomePage() {
   const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const atmABI = atm_abi.abi;
 
-  const getWallet = async() => {
   // Function to get the wallet
   const getWallet = async () => {
     if (window.ethereum) {
@@ -28,40 +25,30 @@ export default function HomePage() {
     }
 
     if (ethWallet) {
-      const account = await ethWallet.request({method: "eth_accounts"});
       const account = await ethWallet.request({ method: "eth_accounts" });
       handleAccount(account);
     }
-  }
   };
 
   // Function to handle the connected account
   const handleAccount = (account) => {
     if (account) {
-      console.log ("Account connected: ", account);
       console.log("Account connected: ", account);
       setAccount(account);
-    }
-    else {
     } else {
       console.log("No account found");
     }
-  }
   };
 
-  const connectAccount = async() => {
   // Function to connect the account
   const connectAccount = async () => {
     if (!ethWallet) {
       alert('MetaMask wallet is required to connect');
       return;
     }
-  
 
     const accounts = await ethWallet.request({ method: 'eth_requestAccounts' });
     handleAccount(accounts);
-    
-    // once wallet is set we can get a reference to our deployed contract
 
     // Once wallet is set, get a reference to the deployed contract
     getATMContract();
@@ -72,25 +59,17 @@ export default function HomePage() {
     const provider = new ethers.providers.Web3Provider(ethWallet);
     const signer = provider.getSigner();
     const atmContract = new ethers.Contract(contractAddress, atmABI, signer);
- 
 
     setATM(atmContract);
-  }
   };
 
-  const getBalance = async() => {
   // Function to get the account balance
   const getBalance = async () => {
     if (atm) {
       setBalance((await atm.getBalance()).toNumber());
     }
-  }
   };
 
-  const deposit = async() => {
-    if (atm) {
-      let tx = await atm.deposit(1);
-      await tx.wait()
   // Function to handle the deposit amount change
   const handleDepositAmountChange = (event) => {
     setDepositAmount(event.target.value);
@@ -113,13 +92,8 @@ export default function HomePage() {
       await tx.wait();
       getBalance();
     }
-  }
   };
 
-  const withdraw = async() => {
-    if (atm) {
-      let tx = await atm.withdraw(1);
-      await tx.wait()
   // Function to withdraw the specified amount
   const withdraw = async () => {
     if (atm && withdrawAmount > 0) {
@@ -127,7 +101,6 @@ export default function HomePage() {
       await tx.wait();
       getBalance();
     }
-  }
   };
 
   // Function to burn the specified amount
@@ -141,31 +114,22 @@ export default function HomePage() {
 
   // Function to initialize the user
   const initUser = () => {
-    // Check to see if user has Metamask
     // Check if the user has Metamask
     if (!ethWallet) {
-      return <p>Please install Metamask in order to use this ATM.</p>
       return <p>Please install Metamask in order to use this ATM.</p>;
     }
 
-    // Check to see if user is connected. If not, connect to their account
     // Check if the user is connected. If not, connect to their account
     if (!account) {
-      return <button onClick={connectAccount}>Please connect your Metamask wallet</button>
       return <button onClick={connectAccount}>Please connect your Metamask wallet</button>;
     }
 
-    if (balance == undefined) {
     if (balance === undefined) {
       getBalance();
     }
 
     return (
       <div>
-        <p>Your Account: {account}</p>
-        <p>Your Balance: {balance}</p>
-        <button onClick={deposit}>Deposit 1 ETH</button>
-        <button onClick={withdraw}>Withdraw 1 ETH</button>
         <label>
           Deposit Amount:
           <input
@@ -196,13 +160,10 @@ export default function HomePage() {
         </label>
         <button onClick={burn}>Burn</button>
       </div>
-    )
-  }
     );
   };
   
 
-  useEffect(() => {getWallet();}, []);
   // useEffect to get the wallet on component mount
   useEffect(() => {
     getWallet();
@@ -212,7 +173,6 @@ export default function HomePage() {
   return (
     <main className="container">
       <header><h1>Welcome to the Metacrafters ATM!</h1></header>
-      {initUser()}
       <div className="content-container">
         <div className="balance-container">
           <p>Your Balance: {balance}</p>
@@ -224,7 +184,6 @@ export default function HomePage() {
       </div>
       <style jsx>{`
         .container {
-          text-align: center
           text-align: center;
           display: flex;
           flex-direction: column;
@@ -260,7 +219,5 @@ export default function HomePage() {
       `}
       </style>
     </main>
-  )
-}
   );
 }
